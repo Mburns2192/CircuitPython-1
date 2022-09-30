@@ -48,7 +48,30 @@ What went wrong / was challenging, how'd you figure it out, and what did you lea
 ### Description & Code
 
 ```python
-Code goes here
+# SPDX-FileCopyrightText: 2018 Kattni Rembor for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
+"""CircuitPython Essentials Servo standard servo example"""
+import time
+import board
+import pwmio
+from adafruit_motor import servo
+
+# create a PWMOut object on Pin A2.
+pwm = pwmio.PWMOut(board.D9, duty_cycle=2 ** 15, frequency=50)
+
+# Create a servo object, my_servo.
+my_servo = servo.Servo(pwm)
+
+while True:
+    for angle in range(0, 180, 180):  # 0 - 180 degrees, 5 degrees at a time.
+        my_servo.angle = angle
+        time.sleep(1)
+    for angle in range (180, 0, -180): # 180 - 0 degrees, 5 degrees at a time.
+        my_servo.angle = angle
+        time.sleep(1)
+
 
 ```
 
@@ -68,7 +91,53 @@ Pictures / Gifs of your work should go here.  You need to communicate what your 
 ### Description & Code
 
 ```python
-Code goes here
+import board
+import time
+import digitalio
+from lcd.lcd import LCD
+
+from lcd.i2c_pcf8574_interface import I2CPCF8574Interface
+from digitalio import DigitalInOut, Direction, Pull 
+
+btn= DigitalInOut(board.D8)
+btn.direction = Direction.INPUT
+btn.pull = Pull.DOWN
+
+switch = DigitalInOut(board.D9)
+switch.direction = Direction.INPUT
+switch.pull = Pull.UP
+
+# get and i2c object
+i2c = board.I2C()
+
+# some LCDs are 0x3f... some are 0x27.
+lcd = LCD(I2CPCF8574Interface(i2c, 0x3f), num_rows=2, num_cols=16)
+
+value = 0
+SwitchState = switch.value
+
+lcd.print("Button:")   #prints what is in the quotes to the lcd 
+lcd.set_cursor_pos(0,8)
+
+prev_state = btn.value
+
+while True:
+    cur_state = btn.value
+
+    if cur_state != prev_state:  
+        if not cur_state:
+            value+=1
+            lcd.set_cursor_pos(0,8)
+            lcd.print(str(value))
+    if switch.value == True:
+      lcd.set_cursor_pos(1,0)
+      lcd.print("True")
+    else:
+      
+      lcd.set_cursor_pos(1,0)
+      lcd.print("False")
+
+    prev_state = cur_state
 
 ```
 
